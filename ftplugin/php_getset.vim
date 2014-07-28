@@ -3,7 +3,7 @@
 " Maintainer: Antoni Jakubiak (antek AT clubbing czest pl)
 " Last Change: 2006 Nov
 " Revision: $Id$
-" Credit: 
+" Credit:
 "    - It's modification java_getset.vim by Pete Kazmier
 "
 " =======================================================================
@@ -48,9 +48,9 @@
 " range).  In either case, the selected block may include comments as they
 " will be ignored during the parsing.  For example, you could select all
 " of these properties with a single visual block.
-" 
-" class Test 
-" { 
+"
+" class Test
+" {
 "    var $count;
 "
 "    var $name;
@@ -83,7 +83,7 @@
 "
 " INTERFACE (commands, mappings, and variables)
 " The following section documents the commands, mappings, and variables
-" used to customize the behavior of this script.  
+" used to customize the behavior of this script.
 "
 " Commands:
 "   :InsertGetterSetter
@@ -141,7 +141,7 @@
 "       map <buffer> <C-p> <Plug>JavagetsetInsertGetterSetter
 "
 "   When you define your own mapping, the default mapping does not get
-"   set, only the mapping you specify.  
+"   set, only the mapping you specify.
 "
 " Variables:
 "   The following variables allow you to customize the behavior of this
@@ -164,10 +164,10 @@
 "     change this by setting this variable to a different key.  For
 "     example, if you want to use the comma-key, you can add this line to
 "     your vimrc:
-"       
+"
 "         let maplocalleader = ','
 "
-"   b:phpgetset_insertPosition
+"   g:phpgetset_insertPosition
 "     This variable determines the location where the getter and/or setter
 "     will be inserted.  Currently, three positions have been defined:
 "
@@ -175,8 +175,8 @@
 "         1 - insert before the current line / block
 "         2 - insert after the current line / block
 "
-"   b:phpgetset_getterTemplate
-"   b:phpgetset_setterTemplate
+"   g:phpgetset_getterTemplate
+"   g:phpgetset_setterTemplate
 "     These variables determine the text that will be inserted for a
 "     getter, setter, array-based getter, and array-based setter
 "     respectively.  The templates may contain the following placeholders
@@ -195,11 +195,11 @@
 "          * @return name
 "          */
 "        function getName() { return $this->name; }
-"     
+"
 "     This block of code can be produced by adding the following variable
 "     definition to your vimrc file.
 "
-"         let b:phpgetset_getterTemplate = 
+"         let g:phpgetset_getterTemplate =
 "           \ "\n" .
 "           \ "/**\n" .
 "           \ " * Get %varname%.\n" .
@@ -217,7 +217,7 @@
 " INSTALLATION
 " 1. Copy the script to your ${HOME}/.vim/ftplugins directory and make
 "    sure its named "php_getset.vim" or "php_something.vim" where
-"    "something" can be anything you want.  
+"    "something" can be anything you want.
 "
 " 2. (Optional) Customize the mapping and/or templates.  You can create
 "    your own filetype plugin (just make sure its loaded before this one)
@@ -230,10 +230,10 @@
 " I make only some modifications in the original code java_getset.vim.
 
 " Only do this when not done yet for this buffer
-if exists("b:did_phpgetset_ftplugin")
+if exists("g:did_phpgetset_ftplugin")
   finish
 endif
-let b:did_phpgetset_ftplugin = 1
+let g:did_phpgetset_ftplugin = 1
 
 " Make sure we are in vim mode
 let s:save_cpo = &cpo
@@ -246,13 +246,13 @@ set cpo&vim
 "   %varname%       The name of the property
 "   %funcname%      The method name ("getXzy" or "setXzy")
 "
-" The templates consist of a getter and setter template.  
+" The templates consist of a getter and setter template.
 "
-" Getter Templates 
-if exists("b:phpgetset_getterTemplate")
-  let s:phpgetset_getterTemplate = b:phpgetset_getterTemplate
-else  
-  let s:phpgetset_getterTemplate = 
+" Getter Templates
+if exists("g:phpgetset_getterTemplate")
+  let s:phpgetset_getterTemplate = g:phpgetset_getterTemplate
+else
+  let s:phpgetset_getterTemplate =
     \ "\n" .
     \ "/**\n" .
     \ " * Get %varname%.\n" .
@@ -267,15 +267,15 @@ endif
 
 
 " Setter Templates
-if exists("b:phpgetset_setterTemplate")
-  let s:phpgetset_setterTemplate = b:phpgetset_setterTemplate
-else  
-  let s:phpgetset_setterTemplate = 
+if exists("g:phpgetset_setterTemplate")
+  let s:phpgetset_setterTemplate = g:phpgetset_setterTemplate
+else
+  let s:phpgetset_setterTemplate =
   \ "\n" .
   \ "/**\n" .
   \ " * Set %varname%.\n" .
   \ " *\n" .
-  \ " * @param %varname% the value to set.\n" . 
+  \ " * @param %varname% the value to set.\n" .
   \ " */\n" .
   \ "function %funcname%($%varname%)\n" .
   \ "{\n" .
@@ -284,20 +284,20 @@ else
 endif
 
 
-" Position where methods are inserted.  The possible values are: 
-"   0 - end of class 
+" Position where methods are inserted.  The possible values are:
+"   0 - end of class
 "   1 = above block / line
 "   2 = below block / line
-if exists("b:phpgetset_insertPosition")
-  let s:phpgetset_insertPosition = b:phpgetset_insertPosition
-else  
+if exists("g:phpgetset_insertPosition")
+  let s:phpgetset_insertPosition = g:phpgetset_insertPosition
+else
   let s:phpgetset_insertPosition = 0
 endif
 
 " Script local variables that are used like globals.
 "
 " If set to 1, the user has requested that getters be inserted
-let s:getter    = 0 
+let s:getter    = 0
 
 " If set to 1, the user has requested that setters be inserted
 let s:setter    = 0
@@ -325,7 +325,7 @@ let s:variable = '\(\s*\)\(\(var\s\+\)*\)\$\(' . s:phpname . '\)\s*\(;\|=[^;]\+;
 " The main entry point. This function saves the current position of the
 " cursor without the use of a mark (see note below)  Then the selected
 " region is processed for properties.
-" 
+"
 " FIXME: I wanted to avoid clobbering any marks in use by the user, so I
 " manually try to save the current position and restore it.  The only drag
 " is that the position isn't restored correctly if the user opts to insert
@@ -349,7 +349,7 @@ if !exists("*s:InsertGetterSetter")
     endif
 
     execute restorepos
-   
+
     " Not sure why I need this but if I don't have it, the drawing on the
     " screen is messed up from my insert.  Perhaps I'm doing something
     " wrong, but it seems to me that I probably shouldn't be calling
@@ -365,26 +365,26 @@ endif
 " getter/setter, and 'a' for ask/prompt user.
 if !exists("*s:DetermineAction")
   function s:DetermineAction(flag)
-  
+
     if a:flag == 'g'
       let s:getter = 1
       let s:setter = 0
-  
+
     elseif a:flag == 's'
       let s:getter = 0
       let s:setter = 1
-  
+
     elseif a:flag == 'b'
       let s:getter = 1
       let s:setter = 1
-  
+
     elseif a:flag == 'a'
       return s:DetermineAction(s:AskUser())
-  
+
     else
       return 0
     endif
-  
+
     return 1
   endfunction
 endif
@@ -394,8 +394,8 @@ endif
 " user cancelled out.
 if !exists("*s:AskUser")
   function s:AskUser()
-    let choice = 
-        \   confirm("What do you want to insert?", 
+    let choice =
+        \   confirm("What do you want to insert?",
         \           "&Getter\n&Setter\n&Both", 3)
 
     if choice == 0
@@ -459,15 +459,15 @@ endif
 " was:
 "
 "     // Age    var $age;    // Name    var $name;
-" 
+"
 " Then, the following strings would be processed one at a time:
 "
 " var $age;
 " var $name;
 "
-if !exists("*s:ProcessRegion") 
+if !exists("*s:ProcessRegion")
   function s:ProcessRegion(region)
-    let startPosition = match(a:region, s:variable, 0) 
+    let startPosition = match(a:region, s:variable, 0)
     let endPosition = matchend(a:region, s:variable, 0)
 
     while startPosition != -1
@@ -476,7 +476,7 @@ if !exists("*s:ProcessRegion")
       "call s:DebugParsing(result)
       call s:ProcessVariable(result)
 
-      let startPosition = match(a:region, s:variable, endPosition) 
+      let startPosition = match(a:region, s:variable, endPosition)
       let endPosition = matchend(a:region, s:variable, endPosition)
     endwhile
 
@@ -485,7 +485,7 @@ endif
 
 " Process a single property.  The first thing this function does is
 " break apart the property into the following components: indentation, name
-" In addition, the following other components are then derived 
+" In addition, the following other components are then derived
 " from the previous: funcname. For example, if the specified variable was:
 "
 " var $name;
@@ -495,11 +495,11 @@ endif
 " indent    = '    '
 " varname   = 'name'
 " funcname  = 'Name'
-" 
+"
 if !exists("*s:ProcessVariable")
   function s:ProcessVariable(variable)
-    let s:indent    = substitute(a:variable, s:variable, '\1', '') 
-    let s:varname   = substitute(a:variable, s:variable, '\4', '') 
+    let s:indent    = substitute(a:variable, s:variable, '\1', '')
+    let s:varname   = substitute(a:variable, s:variable, '\4', '')
     let s:funcname  = toupper(s:varname[0]) . strpart(s:varname, 1)
 
     " If any getter or setter already exists, then just return as there
@@ -588,7 +588,7 @@ if !exists("*s:InsertMethodBody")
 endif
 
 " Move the cursor to the insertion point.  This insertion point can be
-" defined by the user by setting the b:phpgetset_insertPosition variable.  
+" defined by the user by setting the g:phpgetset_insertPosition variable.
 if !exists("*s:MoveToInsertPosition")
   function s:MoveToInsertPosition()
 
@@ -599,12 +599,12 @@ if !exists("*s:MoveToInsertPosition")
     " 2 indicates below the current block / line
     elseif s:phpgetset_insertPosition == 2
       execute "normal! " . s:lastline . "G0"
-    
+
     " 0 indicates end of class (and is default)
     else
       execute "normal! ?{\<CR>w99[{%k" | nohls
 
-    endif 
+    endif
 
   endfunction
 endif
@@ -616,7 +616,7 @@ if !exists("*s:DebugParsing")
     echo 'DEBUG:' a:variable
     echo 'DEBUG: ----------------------------------------------------'
     echo 'DEBUG:    indent:' substitute(a:variable, s:variable, '\1', '')
-    echo 'DEBUG:      name:' substitute(a:variable, s:variable, '\4', '') 
+    echo 'DEBUG:      name:' substitute(a:variable, s:variable, '\4', '')
     echo ''
   endfunction
 endif
@@ -630,62 +630,62 @@ if !exists("no_plugin_maps") && !exists("no_php_maps")
   if !hasmapto('<Plug>JavagetsetInsertGetterSetter')
     map <unique> <buffer> <LocalLeader>p <Plug>JavagetsetInsertGetterSetter
   endif
-  noremap <buffer> <script> 
-    \ <Plug>JavagetsetInsertGetterSetter 
+  noremap <buffer> <script>
+    \ <Plug>JavagetsetInsertGetterSetter
     \ <SID>InsertGetterSetter
-  noremap <buffer> 
-    \ <SID>InsertGetterSetter 
+  noremap <buffer>
+    \ <SID>InsertGetterSetter
     \ :call <SID>InsertGetterSetter('a')<CR>
 
   if !hasmapto('<Plug>JavagetsetInsertGetterOnly')
     map <unique> <buffer> <LocalLeader>g <Plug>JavagetsetInsertGetterOnly
   endif
-  noremap <buffer> <script> 
+  noremap <buffer> <script>
     \ <Plug>JavagetsetInsertGetterOnly
     \ <SID>InsertGetterOnly
-  noremap <buffer> 
+  noremap <buffer>
     \ <SID>InsertGetterOnly
     \ :call <SID>InsertGetterSetter('g')<CR>
 
   if !hasmapto('<Plug>JavagetsetInsertSetterOnly')
     map <unique> <buffer> <LocalLeader>s <Plug>JavagetsetInsertSetterOnly
   endif
-  noremap <buffer> <script> 
+  noremap <buffer> <script>
     \ <Plug>JavagetsetInsertSetterOnly
     \ <SID>InsertSetterOnly
-  noremap <buffer> 
+  noremap <buffer>
     \ <SID>InsertSetterOnly
     \ :call <SID>InsertGetterSetter('s')<CR>
 
   if !hasmapto('<Plug>JavagetsetInsertBothGetterSetter')
     map <unique> <buffer> <LocalLeader>b <Plug>JavagetsetInsertBothGetterSetter
   endif
-  noremap <buffer> <script> 
+  noremap <buffer> <script>
     \ <Plug>JavagetsetInsertBothGetterSetter
     \ <SID>InsertBothGetterSetter
-  noremap <buffer> 
-    \ <SID>InsertBothGetterSetter 
+  noremap <buffer>
+    \ <SID>InsertBothGetterSetter
     \ :call <SID>InsertGetterSetter('b')<CR>
 endif
 
 " Add commands, unless already set.
 if !exists(":InsertGetterSetter")
-  command -range -buffer 
-    \ InsertGetterSetter 
+  command -range -buffer
+    \ InsertGetterSetter
     \ :<line1>,<line2>call s:InsertGetterSetter('a')
 endif
 if !exists(":InsertGetterOnly")
-  command -range -buffer 
+  command -range -buffer
     \ InsertGetterOnly
     \ :<line1>,<line2>call s:InsertGetterSetter('g')
 endif
 if !exists(":InsertSetterOnly")
-  command -range -buffer 
+  command -range -buffer
     \ InsertSetterOnly
     \ :<line1>,<line2>call s:InsertGetterSetter('s')
 endif
 if !exists(":InsertBothGetterSetter")
-  command -range -buffer 
+  command -range -buffer
     \ InsertBothGetterSetter
     \ :<line1>,<line2>call s:InsertGetterSetter('b')
 endif
