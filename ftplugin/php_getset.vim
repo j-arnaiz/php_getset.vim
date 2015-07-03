@@ -37,7 +37,7 @@ endif
 if exists("g:phpgetset_setterTemplate")
   let s:phpgetset_setterTemplate = g:phpgetset_setterTemplate
 else
-  let s:phpgetset_setterTemplate =
+  let s:phpgetset_setterTemplate = "".
     \ "\n".
     \ "   /**\n".
     \ "    * @param mixed $%varname%\n".
@@ -48,7 +48,8 @@ else
     \ "   {\n".
     \ "       $this->%varname% = $%varname%;\n\n".
     \ "       return $this;\n".
-    \ "   }"
+    \ "   }".
+    \ "\n"
 endif
 
 
@@ -90,6 +91,20 @@ let s:phpname = '[a-zA-Z_$][a-zA-Z0-9_$]*'
 let s:brackets = '\(\s*\(\[\s*\]\)\)\='
 let s:variable = '\(\s*\)\(\(var\s\+\)*\)\$\(' . s:phpname . '\)\s*\(;\|=[^;]\+;\)'
 
+if !exists("*s:StripTrailingWhitespace")
+    function s:StripTrailingWhitespace()
+        " Preparation: save last search, and cursor position.
+        let _s=@/
+        let l = line(".")
+        let c = col(".")
+        " do the business:
+        %s/\s\+$//e
+        " clean up: restore previous search history, and cursor position
+        let @/=_s
+        call cursor(l, c)
+    endfunction
+endif
+
 " The main entry point. This function saves the current position of the
 " cursor without the use of a mark (see note below)  Then the selected
 " region is processed for properties.
@@ -124,6 +139,7 @@ if !exists("*s:InsertGetterSetter")
     " redraw.
     redraw!
 
+    call s:StripTrailingWhitespace()
   endfunction
 endif
 
@@ -361,6 +377,7 @@ if !exists(":InsertGetterSetter")
     \ InsertGetterSetter
     \ :<line1>,<line2>call s:InsertGetterSetter('b')
 endif
+
 
 map <Leader>ig :InsertGetter<CR>
 map <Leader>is :InsertSetter<CR>
