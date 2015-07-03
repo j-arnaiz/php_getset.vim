@@ -356,9 +356,9 @@ if !exists(":InsertSetterOnly")
     \ InsertSetterOnly
     \ :<line1>,<line2>call s:InsertGetterSetter('s')
 endif
-if !exists(":InsertBothGetterSetter")
+if !exists(":InsertGetterSetter")
   command -range
-    \ InsertBothGetterSetter
+    \ InsertGetterSetter
     \ :<line1>,<line2>call s:InsertGetterSetter('b')
 endif
 
